@@ -5,7 +5,7 @@ Module Docstring
 
 __author__ = "Dennis Irrgang"
 __version__ = "0.1.0"
-__license__ = "MIT"
+__license__ = "AGPL-3.0"
 
 import re
 import tkinter as tk
