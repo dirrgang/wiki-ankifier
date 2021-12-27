@@ -9,50 +9,72 @@ __license__ = "AGPL-3.0"
 
 import re
 import tkinter as tk
+import pyperclip
+
+
 class Application(tk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master: tk):
         super().__init__(master)
         self.master = master
-        self.pack()
+
         self.create_widgets()
 
-    def create_widgets(self):
-        self.ankify_button = tk.Button(self)
+    def create_widgets(self) -> None:
+        self.frameButtons = tk.Frame()
+        self.frameButtons.pack(fill=tk.X, ipadx=40, ipady=10, padx=10, pady=10)
+
+        self.ankify_button = tk.Button(master=self.frameButtons)
         self.ankify_button["text"] = "Ankify!"
         self.ankify_button["command"] = self.ankify
-        self.ankify_button.pack(side="top")
+        self.ankify_button.pack(side=tk.LEFT, ipadx=5, ipady=5)
 
-        self.quit = tk.Button(self, text="QUIT", fg="red",
+        self.obsidianfy_button = tk.Button(master=self.frameButtons)
+        self.obsidianfy_button["text"] = "Obsidianfy!"
+        self.obsidianfy_button["command"] = self.obsidianfy
+        self.obsidianfy_button.pack(side=tk.RIGHT, ipadx=5, ipady=5)
+
+        self.frameExit = tk.Frame(width=50, height=50)
+        self.frameExit.pack(fill=tk.X, ipadx=5, ipady=5)
+
+        self.quit = tk.Button(self.frameExit, text="QUIT", fg="red",
                               command=self.master.destroy)
-        self.quit.pack(side="bottom")
+        self.quit.pack()
 
-        self.input_box = tk.Text()
-        self.input_box.pack()
+        # self.pack()
 
-        self.output_box = tk.Text()
-        self.output_box.pack()
+        # self.input_box = tk.Text()
+        # self.input_box.pack()
+
+    def output(self, text: str) -> None:
+        # self.input_box.delete("1.0", tk.END)
+        # self.input_box.insert("1.0", text)
+        pyperclip.copy(text)
 
     def ankify(self):
         """ Main entry point of the app """
-        
-
-        inputText = self.input_box.get("1.0", tk.END)
+        # inputText = self.input_box.get("1.0", tk.END)
+        inputText = pyperclip.paste()
 
         imgRegex = re.compile('\\)<.*?>')
         mathJaxOpen = re.compile(re.escape('{\displaystyle'))
         mathJaxClose = re.compile(re.escape('}<'))
 
-        test = re.sub(mathJaxOpen, '\({\\\\displaystyle', re.sub(mathJaxClose, '}\)<', inputText))
+        result = re.sub(
+            mathJaxOpen, '\({\\\\displaystyle', re.sub(mathJaxClose, '}\)<', inputText))
 
-        removedImgs = re.sub(imgRegex, ")", test)
+        self.output(re.sub(imgRegex, ")", result))
 
-        self.output_box.delete("1.0", tk.END)
-        self.output_box.insert("1.0", removedImgs)
+    def obsidianfy(self):
+        inputText = pyperclip.paste()
 
+        inputText = re.sub(r'<math>', r'$', inputText)
+        inputText = re.sub(r'</math>', r'$', inputText)
+        self.output(inputText)
 
 
 if __name__ == "__main__":
     """ This is executed when run from the command line """
-    root = tk.Tk()
-    app = Application(master=root)
+    window = tk.Tk()
+    window.title("Work damnit")
+    app = Application(master=window)
     app.mainloop()
