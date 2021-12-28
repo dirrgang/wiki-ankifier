@@ -67,9 +67,25 @@ class Application(tk.Frame):
     def obsidianfy(self):
         inputText = pyperclip.paste()
 
-        inputText = re.sub(r'<math>', r'$', inputText)
+        inputText = re.sub(r'(:(| )|)<math(>|.+?>)', r'$', inputText)
         inputText = re.sub(r'</math>', r'$', inputText)
-        self.output(inputText)
+        inputText = re.sub(r'(\<ref\>)|(\<\/ref\>)', r'', inputText)
+
+        inputText = re.split(r'(\[{2}.+?\]{2})', inputText)
+
+        result = ""
+        for obj in inputText:
+            if obj[0:2] == "[[":
+                if obj.count("|") > 0:
+                    result += obj[obj.find("|")+1:-2]
+                else:
+                    result += obj[obj.find(">")+1:-2]
+            else:
+                result += obj
+
+        
+
+        self.output(result)
 
 
 if __name__ == "__main__":
