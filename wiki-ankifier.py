@@ -72,24 +72,10 @@ class Application(tk.Frame):
         inputText = re.sub(r'(<|\s?<)/math>', r'$', inputText)
         inputText = re.sub(r'(\<ref\>)|(\<\/ref\>)', r'', inputText)
         inputText = re.sub(r"'''", r'***', inputText)
-        
+
         inputText = re.sub(r'\\N', r'\\mathbb N', inputText)
         inputText = re.sub(r'\\R', r'\\mathbb R', inputText)
         inputText = re.sub(r'\\Z', r'\\mathbb Z', inputText)
-
-        inputText = re.split(r'(\[{2}.+?\]{2})', inputText)
-
-        result = ""
-        for obj in inputText:
-            if obj[0:2] == "[[":
-                if obj.count("|") > 0:
-                    result += obj[obj.find("|")+1:-2]
-                else:
-                    result += obj[2:-2]
-            else:
-                result += obj
-        inputText = result
-
         inputText = re.split(r'(={1,5}.+?={1,5}(\r|\n))', inputText)
 
         result = ""
@@ -97,6 +83,18 @@ class Application(tk.Frame):
             n = obj[0:5].count('=')
             if n >= 1:
                 result += re.sub(r'=', r'#', obj, n)[:-n-1]
+            else:
+                result += obj
+
+        inputText = result
+
+        inputText = re.split(r"('{2}.*?'{2})", inputText)
+
+        result = ""
+        for obj in inputText:
+            n = obj[0:2].count("'")
+            if n >= 1:
+                result += re.sub(r"''", r'*', obj, n)
             else:
                 result += obj
 
