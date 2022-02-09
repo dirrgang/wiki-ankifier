@@ -10,7 +10,6 @@ __license__ = "AGPL-3.0"
 import re
 import tkinter as tk
 import pyperclip
-import math
 from markdownify import markdownify as md
 
 
@@ -66,50 +65,42 @@ class Application(tk.Frame):
 
         self.output(re.sub(imgRegex, ")", result))
 
-    def tokenReplace(self, input: str, regexpr: str, oldToken: str, newToken: str,  offsetl=0, offsetr=0):
-        result = ""
-        input = re.split(regexpr, input)
-
-        for obj in input:
-            n = math.floor (obj.count(oldToken) / 2)
-            if obj[len(oldToken)] == oldToken:
-                result += newToken*(n+offsetl) + obj[n:-n] + newToken*(n+offsetr)
-            else:
-                result += obj
-        return result
-
     def obsidianfy(self):
         inputText = pyperclip.paste()
 
         inputText = re.sub(r'(:(| )|)<math(>|.+?>)\s?', r'$', inputText)
         inputText = re.sub(r'(<|\s?<)/math>', r'$', inputText)
         inputText = re.sub(r'(\<ref\>)|(\<\/ref\>)', r'', inputText)
+        inputText = re.sub(r"'''", r'***', inputText)
+        inputText = re.sub(r"<.+?>", r'```', inputText)
 
-        inputText = re.sub(r'\\N\b', r'\\mathbb N', inputText)
-        inputText = re.sub(r'\\R\b', r'\\mathbb R', inputText)
-        inputText = re.sub(r'\\Z\b', r'\\mathbb Z', inputText)
-        inputText = re.sub(r'\\Q\b', r'\\mathbb Q', inputText)
+        inputText = re.sub(r'\\N', r'\\mathbb N', inputText)
+        inputText = re.sub(r'\\Complex', r'\\mathbb C', inputText)
+        inputText = re.sub(r'\\R(?!ightarrow)', r'\\mathbb R', inputText)
+        inputText = re.sub(r'\\Z', r'\\mathbb Z', inputText)
+        inputText = re.split(r'(={1,5}.+?={1,5}(\r|\n))', inputText)
 
-        inputText = self.tokenReplace(
-            inputText, r"(''+.*?''+)", r"'", r"*", -1, -1)
-        inputText = self.tokenReplace(
-            inputText, r'(={2,5}.+?={2,5})', r"=", r"#")
+        result = ""
+        for obj in inputText:
+            n = obj[0:5].count('=')
+            if n >= 1:
+                result += re.sub(r'=', r'#', obj, n)[:-n-1]
+            else:
+                result += obj
 
+        inputText = result
 
-        # result = ""
-        # inputText = re.split(r"(<math>(?:(?!\<\/)?:(.|\n))*?<\/math>)", inputText)
+        inputText = re.split(r"('{2}.*?'{2})", inputText)
 
-        # for obj in inputText:
-        #     if obj.count(r'<math>') >= 1:
-                
-        #         temp = re.sub(r'<math>', r'$', re.sub(r'<\/math>', r'$', obj))
-        #         result += temp
-        #     else:
-        #         result += obj
+        result = ""
+        for obj in inputText:
+            n = obj[0:2].count("'")
+            if n >= 1:
+                result += re.sub(r"''", r'*', obj, n)
+            else:
+                result += obj
 
-        # inputText = result
-            
-        self.output(inputText)
+        self.output(result)
 
 
 if __name__ == "__main__":
