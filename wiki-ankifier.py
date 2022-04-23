@@ -68,33 +68,33 @@ class Application(tk.Frame):
         inputText = pyperclip.paste()
 
         # MathJax
-        inputText = re.sub(r'(\n:(| )|)<math(>|.+?>)\s?', r'$', inputText)
-        inputText = re.sub(r'(<|\s?<)/math>', r'$', inputText)
+        inputText = re.sub(r'\n:<math>(.*?)<\/math>', r'$$\1$$', inputText)
+        inputText = re.sub(r'<math>(.*?)<\/math>', r'$\1$', inputText)
+
+        # Language Indicators
+        inputText = re.sub(r"{{(en|de).*?''(.*?)''}}", r"''\2''", inputText)
 
         # References
         inputText = re.sub(
-            r'(<ref>|<ref name=".*">).*?(\/ref>)', r'', inputText)
+            r'(<ref>|<ref name=".*?">).*?(<\/ref>)', r'', inputText)
 
         # Inline Code Formatting
-        inputText = re.sub(r"\<code\>", r'`', inputText)
-        inputText = re.sub(r"\<\/code\>", r'`', inputText)
+        inputText = re.sub(r"<code>(.*?)<\/code>", r'`\1`', inputText)
 
         # Block Code Formatting
         inputText = re.sub(
-            r'\<syntaxhighlight lang="(.+)" line\>', r'```\1', inputText)
-        inputText = re.sub(r'\<syntaxhighlight\>', r'```', inputText)
-        inputText = re.sub(r'\<\/syntaxhighlight\>', r'```', inputText)
+            r'\<syntaxhighlight lang="(.+)?".*?\>\n((.|\n)*?)\<\/syntaxhighlight\>', r'```\1\n\2\n```', inputText)
 
         # External URLs
         inputText = re.sub(r'\[(http.*?) (.*?)\]', r'[\2](\1)', inputText)
 
         # Text Formatting
-        inputText = re.sub(r"'''", r'**', inputText)
-        inputText = re.sub(r"''", r'*', inputText)
-        inputText = re.sub(r"'", r'*', inputText)
+        inputText = re.sub(r"'''(.*?)'''", r'**\1**', inputText)
+        inputText = re.sub(r"''(.*?)''", r'*\1*', inputText)
+        inputText = re.sub(r"'(.*?)'", r'*\1*', inputText)
 
         # Language
-        inputText = re.sub(r'{{lang\|..\|', r'', inputText)
+        inputText = re.sub(r'{{lang\|..\|(.*?)}}', r'\1', inputText)
 
         # URL
         inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
@@ -107,18 +107,14 @@ class Application(tk.Frame):
         inputText = re.sub(r'\n# ', r'\n 1. ', inputText)
 
         # Headings
-        inputText = re.split(r'(={1,5}.+?={1,5}(\r|\n))', inputText)
-        result = ""
-        for obj in inputText:
-            n = obj[0:5].count('=')
-            if n >= 1:
-                result += re.sub(r'=', r'#', obj, n)[:-n-1]
-            else:
-                result += obj
+        for i in range(1, 5):
+            OldFormat = i * '='
+            NewFormat = i * '#'
 
-        inputText = result
+            inputText = re.sub(rf'\n{OldFormat} (.*?) {OldFormat}',
+                               rf"{NewFormat} \1", inputText)
 
-        self.output(result)
+        self.output(inputText)
 
 
 if __name__ == "__main__":
