@@ -10,7 +10,6 @@ __license__ = "AGPL-3.0"
 import re
 import tkinter as tk
 import pyperclip
-from markdownify import markdownify as md
 
 
 class Application(tk.Frame):
@@ -68,16 +67,20 @@ class Application(tk.Frame):
     def obsidianfy(self):
         inputText = pyperclip.paste()
 
-        inputText = re.sub(r'(:(| )|)<math(>|.+?>)\s?', r'$', inputText)
+        inputText = re.sub(r'(\n:(| )|)<math(>|.+?>)\s?', r'$', inputText)
         inputText = re.sub(r'(<|\s?<)/math>', r'$', inputText)
-        inputText = re.sub(r'(\<ref\>)|(\<\/ref\>)', r'', inputText)
-        inputText = re.sub(r"'''", r'***', inputText)
-        inputText = re.sub(r"<.+?>", r'```', inputText)
+        inputText = re.sub(r'(<ref>|<ref name=".*">).*?(\/ref>)', r'', inputText)
+        inputText = re.sub(r"'''", r'**', inputText)
+        inputText = re.sub(r"''", r'*', inputText)
+        inputText = re.sub(r"'", r'*', inputText)
 
         inputText = re.sub(r'\\N', r'\\mathbb N', inputText)
         inputText = re.sub(r'\\Complex', r'\\mathbb C', inputText)
         inputText = re.sub(r'\\R(?!ightarrow)', r'\\mathbb R', inputText)
         inputText = re.sub(r'\\Z', r'\\mathbb Z', inputText)
+        inputText = re.sub(r'{{lang\|..\|', r'', inputText)
+        inputText = re.sub(r'\n# ', r'\n 1. ', inputText)
+        inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
         inputText = re.split(r'(={1,5}.+?={1,5}(\r|\n))', inputText)
 
         result = ""
@@ -89,16 +92,6 @@ class Application(tk.Frame):
                 result += obj
 
         inputText = result
-
-        inputText = re.split(r"('{2}.*?'{2})", inputText)
-
-        result = ""
-        for obj in inputText:
-            n = obj[0:2].count("'")
-            if n >= 1:
-                result += re.sub(r"''", r'*', obj, n)
-            else:
-                result += obj
 
         self.output(result)
 
