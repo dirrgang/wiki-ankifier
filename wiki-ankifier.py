@@ -70,6 +70,16 @@ class Application(tk.Frame):
         # MathJax
         inputText = re.sub(r'\n:<math>(.*?)<\/math>', r'$$\1$$', inputText)
         inputText = re.sub(r'<math>(.*?)<\/math>', r'$\1$', inputText)
+        inputText = re.sub(r'\n:', r'\n', inputText)
+
+        # Nowrap
+        inputText = re.sub(r'{{nowrap\|(.*?)}}', r'\1', inputText)
+
+        # Wikitable
+        inputText = re.sub(r'{\| class="wikitable"((.|\n)*?)\|}', r'', inputText)
+        
+        # Infobox
+        inputText = re.sub(r'{{Infobox ((.|\n)*?)}}', r'', inputText)
 
         # Language Indicators
         inputText = re.sub(r"{{(en|de).*?''(.*?)''}}", r"''\2''", inputText)
@@ -83,7 +93,7 @@ class Application(tk.Frame):
 
         # Block Code Formatting
         inputText = re.sub(
-            r'\<syntaxhighlight lang="(.+)?".*?\>\n((.|\n)*?)\<\/syntaxhighlight\>', r'```\1\n\2\n```', inputText)
+            r'\<syntaxhighlight lang="(.*)".*?\>((.|\n)*?)\<\/syntaxhighlight\>', r'```\1\n\2\n```', inputText)
 
         # External URLs
         inputText = re.sub(r'\[(http.*?) (.*?)\]', r'[\2](\1)', inputText)
