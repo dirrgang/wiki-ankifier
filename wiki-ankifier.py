@@ -67,22 +67,47 @@ class Application(tk.Frame):
     def obsidianfy(self):
         inputText = pyperclip.paste()
 
+        # MathJax
         inputText = re.sub(r'(\n:(| )|)<math(>|.+?>)\s?', r'$', inputText)
         inputText = re.sub(r'(<|\s?<)/math>', r'$', inputText)
-        inputText = re.sub(r'(<ref>|<ref name=".*">).*?(\/ref>)', r'', inputText)
+
+        # References
+        inputText = re.sub(
+            r'(<ref>|<ref name=".*">).*?(\/ref>)', r'', inputText)
+
+        # Inline Code Formatting
+        inputText = re.sub(r"\<code\>", r'`', inputText)
+        inputText = re.sub(r"\<\/code\>", r'`', inputText)
+
+        # Block Code Formatting
+        inputText = re.sub(
+            r'\<syntaxhighlight lang="(.+)" line\>', r'```\1', inputText)
+        inputText = re.sub(r'\<syntaxhighlight\>', r'```', inputText)
+        inputText = re.sub(r'\<\/syntaxhighlight\>', r'```', inputText)
+
+        # External URLs
+        inputText = re.sub(r'\[(http.*?) (.*?)\]', r'[\2](\1)', inputText)
+
+        # Text Formatting
         inputText = re.sub(r"'''", r'**', inputText)
         inputText = re.sub(r"''", r'*', inputText)
         inputText = re.sub(r"'", r'*', inputText)
 
+        # Language
+        inputText = re.sub(r'{{lang\|..\|', r'', inputText)
+
+        # URL
+        inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
+
+        # Wiki-specific oddities
         inputText = re.sub(r'\\N', r'\\mathbb N', inputText)
         inputText = re.sub(r'\\Complex', r'\\mathbb C', inputText)
         inputText = re.sub(r'\\R(?!ightarrow)', r'\\mathbb R', inputText)
         inputText = re.sub(r'\\Z', r'\\mathbb Z', inputText)
-        inputText = re.sub(r'{{lang\|..\|', r'', inputText)
         inputText = re.sub(r'\n# ', r'\n 1. ', inputText)
-        inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
-        inputText = re.split(r'(={1,5}.+?={1,5}(\r|\n))', inputText)
 
+        # Headings
+        inputText = re.split(r'(={1,5}.+?={1,5}(\r|\n))', inputText)
         result = ""
         for obj in inputText:
             n = obj[0:5].count('=')
