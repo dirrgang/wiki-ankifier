@@ -143,6 +143,6 @@ class Application(tk.Frame):
 if __name__ == "__main__":
     """ This is executed when run from the command line """
     window = tk.Tk()
-    window.title("Work damnit")
+    window.title("Wiki Ankifier")
     app = Application(master=window)
     app.mainloop()
