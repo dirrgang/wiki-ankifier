@@ -68,9 +68,12 @@ class Application(tk.Frame):
         inputText = pyperclip.paste()
 
         # MathJax
-        inputText = re.sub(r'\n:<math>(.*?)<\/math>', r'$$\1$$', inputText)
-        inputText = re.sub(r'<math>(.*?)<\/math>', r'$\1$', inputText)
+        inputText = re.sub(r'\n:\s*?<math(?:(>| display="inline">))((.|\n)*?)<\/math>(.|)', r'\n$$\2\4$$', inputText)
+        inputText = re.sub(r'<math(?:(>| display="inline">))(.*?)<\/math>', r'$\2$', inputText)
         inputText = re.sub(r'\n:', r'\n', inputText)
+
+        # Categories
+        inputText = re.sub(r'\[\[Kategorie:(.*?)\]\]', r'#\1', inputText)
 
         # Nowrap
         inputText = re.sub(r'{{nowrap\|(.*?)}}', r'\1', inputText)
