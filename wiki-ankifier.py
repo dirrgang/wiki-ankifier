@@ -118,6 +118,8 @@ class Application(tk.Frame):
 
         # Language
         inputText = re.sub(r'{{lang\|..\|(.*?)}}', r'\1', inputText)
+        inputText = re.sub(r'{{\w*?S\|(.*?)}}', r'*\1*', inputText)
+
 
         # URL
         inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
