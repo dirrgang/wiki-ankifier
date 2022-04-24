@@ -67,10 +67,16 @@ class Application(tk.Frame):
     def obsidianfy(self):
         inputText = pyperclip.paste()
 
+        # Concatenation of Math formulas
+        inputText = re.sub(r'<\/math> (für alle) <math>',
+                           r'\\quad \\text{für alle} \\quad ', inputText)
+
         # MathJax
-        inputText = re.sub(r'\n:\s*?<math(?:(>| display="inline">))((.|\n)*?)<\/math>(.|)', r'\n$$\2\4$$', inputText)
-        inputText = re.sub(r'<math(?:(>| display="inline">))(.*?)<\/math>', r'$\2$', inputText)
-        inputText = re.sub(r'\n:', r'\n', inputText)
+        inputText = re.sub(
+            r'\n:?\s*<math(?:(>| display="inline">))((.|\n)*?)<\/math>(.|)', r'\n$$\2\4$$', inputText)
+        inputText = re.sub(
+            r'<math(?:(>| display="inline">))\s*(.*?)\s*<\/math>', r'$\2$', inputText)
+        inputText = re.sub(r'\n+', r'\n', inputText)
 
         # Categories
         inputText = re.sub(r'\[\[Kategorie:(.*?)\]\]', r'#\1', inputText)
@@ -79,8 +85,9 @@ class Application(tk.Frame):
         inputText = re.sub(r'{{nowrap\|(.*?)}}', r'\1', inputText)
 
         # Wikitable
-        inputText = re.sub(r'{\| class="wikitable"((.|\n)*?)\|}', r'', inputText)
-        
+        inputText = re.sub(
+            r'{\| class="wikitable"((.|\n)*?)\|}', r'', inputText)
+
         # Infobox
         inputText = re.sub(r'{{Infobox ((.|\n)*?)}}', r'', inputText)
 
@@ -100,6 +107,9 @@ class Application(tk.Frame):
 
         # External URLs
         inputText = re.sub(r'\[(http.*?) (.*?)\]', r'[\2](\1)', inputText)
+
+        # Lists
+        inputText = re.sub(r'\n(\*)', r'\n* ', inputText)
 
         # Text Formatting
         inputText = re.sub(r"'''(.*?)'''", r'**\1**', inputText)
