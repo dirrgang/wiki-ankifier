@@ -84,6 +84,17 @@ class Application(tk.Frame):
         # Nowrap
         inputText = re.sub(r'{{nowrap\|(.*?)}}', r'\1', inputText)
 
+        # Lists
+        inputText = re.sub(r'\n(\*)', r'\n* ', inputText)
+
+        # Article references
+        inputText = re.sub(r'{{(Hauptartikel|Siehe auch)\|(.*?)}}',
+                           r'*→ \1: [[\2]]*', inputText)
+
+        # Highlight
+        inputText = re.sub(r'^; (.*?)(?:: |(?:\r|\n)+):*(.*?)$',
+                           r'**\1**\n\2\n', inputText, flags=re.MULTILINE)
+
         # Wikitable
         inputText = re.sub(
             r'{\| class="wikitable"((.|\n)*?)\|}', r'', inputText)
@@ -108,18 +119,13 @@ class Application(tk.Frame):
         # External URLs
         inputText = re.sub(r'\[(http.*?) (.*?)\]', r'[\2](\1)', inputText)
 
-        # Lists
-        inputText = re.sub(r'\n(\*)', r'\n* ', inputText)
-
         # Text Formatting
         inputText = re.sub(r"'''(.*?)'''", r'**\1**', inputText)
         inputText = re.sub(r"''(.*?)''", r'*\1*', inputText)
-        inputText = re.sub(r"'(.*?)'", r'*\1*', inputText)
 
         # Language
         inputText = re.sub(r'{{lang\|..\|(.*?)}}', r'\1', inputText)
         inputText = re.sub(r'{{\w*?S\|(.*?)}}', r'*\1*', inputText)
-
 
         # URL
         inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
@@ -130,14 +136,15 @@ class Application(tk.Frame):
         inputText = re.sub(r'\\R(?!ightarrow)', r'\\mathbb R', inputText)
         inputText = re.sub(r'\\Z', r'\\mathbb Z', inputText)
         inputText = re.sub(r'\n# ', r'\n 1. ', inputText)
+        inputText = re.sub(r'{{enS}}', r'engl.', inputText)
 
         # Headings
-        for i in range(1, 5):
+        for i in range(1, 6):
             OldFormat = i * '='
             NewFormat = i * '#'
 
-            inputText = re.sub(rf'\n{OldFormat} (.*?) {OldFormat}',
-                               rf"{NewFormat} \1", inputText)
+            inputText = re.sub(rf"^{OldFormat} (.*?) {OldFormat}",
+                               rf"{NewFormat} \1", inputText, flags=re.MULTILINE)
 
         self.output(inputText)
 
