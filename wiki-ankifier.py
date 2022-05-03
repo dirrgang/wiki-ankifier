@@ -73,7 +73,7 @@ class Application(tk.Frame):
 
         # MathJax
         inputText = re.sub(
-            r'\n:?\s*<math(?:(>| display="inline">))((.|\n)*?)<\/math>(.|)', r'\n$$\2\4$$', inputText)
+            r'\n(\**):*\s*<math(?:(>| display="inline">))((.|\n)*?)<\/math>(.|)', r'\n$$\3\5$$', inputText)
         inputText = re.sub(
             r'<math(?:(>| display="inline">))\s*(.*?)\s*<\/math>', r'$\2$', inputText)
         inputText = re.sub(r'\n+', r'\n', inputText)
@@ -137,6 +137,7 @@ class Application(tk.Frame):
         inputText = re.sub(r'\\Z', r'\\mathbb Z', inputText)
         inputText = re.sub(r'\n# ', r'\n 1. ', inputText)
         inputText = re.sub(r'{{enS}}', r'engl.', inputText)
+        inputText = re.sub(r'(\\sgn)', r'\\operatorname{sgn}', inputText)
 
         # Headings
         for i in range(1, 6):
