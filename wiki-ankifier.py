@@ -68,7 +68,7 @@ class Application(tk.Frame):
         inputText = pyperclip.paste()
 
         # Concatenation of Math formulas
-        inputText = re.sub(r'<\/math> (für alle) <math>',
+        inputText = re.sub(r'<\/math> (mit|für alle) <math>',
                            r'\\quad \\text{für alle} \\quad ', inputText)
 
         # MathJax
@@ -85,7 +85,7 @@ class Application(tk.Frame):
         inputText = re.sub(r'{{nowrap\|(.*?)}}', r'\1', inputText)
 
         # Lists
-        inputText = re.sub(r'\n(\*)', r'\n* ', inputText)
+        inputText = re.sub(r'\n(\*)(?!\*)', r'\n* ', inputText)
 
         # Article references
         inputText = re.sub(r'{{(Hauptartikel|Siehe auch)\|(.*?)}}',
@@ -107,10 +107,13 @@ class Application(tk.Frame):
 
         # References
         inputText = re.sub(
-            r'(<ref>|<ref name=".*?">).*?(<\/ref>)', r'', inputText)
+            r'(<ref>|<ref name=".*?">)(.|\n)*?(<\/ref>)', r'', inputText)
+
+        # Nowiki
+        inputText = re.sub(r"<nowiki>(.*?)<\/nowiki>", r"`\1`", inputText)
 
         # Inline Code Formatting
-        inputText = re.sub(r"<code>(.*?)<\/code>", r'`\1`', inputText)
+        # inputText = re.sub(r"<code>(.*?)<\/code>", r'`\1`', inputText)
 
         # Block Code Formatting
         inputText = re.sub(
@@ -131,6 +134,7 @@ class Application(tk.Frame):
         inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
 
         # Wiki-specific oddities
+        inputText = re.sub(r'{{Bruch\|(.*?)(?:\|(.*?))?}}', r'$\\frac{\1}{\2}$', inputText)
         inputText = re.sub(r'\\N', r'\\mathbb N', inputText)
         inputText = re.sub(r'\\Complex', r'\\mathbb C', inputText)
         inputText = re.sub(r'\\R(?!ightarrow)', r'\\mathbb R', inputText)
