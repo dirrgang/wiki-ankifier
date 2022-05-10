@@ -73,9 +73,18 @@ class Application(tk.Frame):
 
         # MathJax
         inputText = re.sub(
-            r'\n:*\s*<math(?:(>| display="inline">))((.|\n)*?)<\/math>(.|)', r'\n$$\2\4$$', inputText)
+            r'^:+\s*?<math(?:(?:>| display="inline">))\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(.*?)$', r'$$\1\2$$', inputText, flags=re.MULTILINE)
+
+        # Tabs
+        for i in range(1, 6):
+            OldFormat = i * ':'
+            NewFormat = i * '&nbsp;&nbsp;&nbsp;&nbsp;'
+
+            inputText = re.sub(rf"^{OldFormat}",
+                               rf"{NewFormat}", inputText, flags=re.MULTILINE)
+
         inputText = re.sub(
-            r'<math(?:(>| display="inline">))\s*(.*?)\s*<\/math>', r'$\2$', inputText)
+            r'<math(?:(?:>| display="inline">))\s*(.*?)(?:\\ |)*?\s*<\/math>', r'$\1$', inputText)
         inputText = re.sub(r'\n+', r'\n', inputText)
 
         # Categories
@@ -107,7 +116,7 @@ class Application(tk.Frame):
 
         # References
         inputText = re.sub(
-            r'(<ref>|<ref name=".*?">)(.|\n)*?(<\/ref>)', r'', inputText)
+            r'<ref>|<ref (?:name|group)=".*?">(?:.|\n)*?(?:<\/ref>)', r'', inputText)
 
         # Nowiki
         inputText = re.sub(r"<nowiki>(.*?)<\/nowiki>", r"`\1`", inputText)
@@ -134,22 +143,18 @@ class Application(tk.Frame):
         inputText = re.sub(r'{{\w+\|url.+?}}', r'', inputText)
 
         # Wiki-specific oddities
-        inputText = re.sub(r'{{Bruch\|(.*?)(?:\|(.*?))?}}', r'$\\frac{\1}{\2}$', inputText)
+        inputText = re.sub(r'{{Bruch\|(.*?)(?:\|(.*?))?}}',
+                           r'$\\frac{\1}{\2}$', inputText)
         inputText = re.sub(r'\\N', r'\\mathbb N', inputText)
         inputText = re.sub(r'\\Complex', r'\\mathbb C', inputText)
+        inputText = re.sub(r'\\Q(\W)', r'\\mathbb Q\1', inputText)
+        inputText = re.sub(r'\\C(\W)', r'\\mathbb C\1', inputText)
         inputText = re.sub(r'\\R(?!ightarrow)', r'\\mathbb R', inputText)
         inputText = re.sub(r'\\Z', r'\\mathbb Z', inputText)
         inputText = re.sub(r'\n# ', r'\n 1. ', inputText)
         inputText = re.sub(r'{{enS}}', r'engl.', inputText)
         inputText = re.sub(r'(\\sgn)', r'\\operatorname{sgn}', inputText)
 
-        # Tabs
-        for i in range(1, 6):
-            OldFormat = i * ':'
-            NewFormat = i * '&nbsp;&nbsp;&nbsp;&nbsp;'
-
-            inputText = re.sub(rf"^{OldFormat}",
-                               rf"{NewFormat}", inputText, flags=re.MULTILINE)
 
         # Headings
         for i in range(1, 6):
