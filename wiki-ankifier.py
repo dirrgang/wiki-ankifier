@@ -73,7 +73,25 @@ class Application(tk.Frame):
 
         # MathJax
         inputText = re.sub(
-            r'^:+\s*?<math(?:(?:>| display="inline">))\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(.*?)$', r'$$\1\2$$', inputText, flags=re.MULTILINE)
+            r'^:+\s*?<math display="inline">\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(.*?)',
+            r'$$\\textstyle \1\2$$', inputText,
+            flags=re.MULTILINE)
+        inputText = re.sub(
+            r'^:+\s*?<math>\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(.*?)',
+            r'$$\1\2$$', inputText,
+            flags=re.MULTILINE)
+
+        inputText = re.sub(
+            r'<math display="inline">\s*(.*?)\s*<\/math>', 
+            r'$\1$', 
+            inputText)
+        inputText = re.sub(
+            r'<math>\s*(.*?)\s*<\/math>', 
+            r'$\\displaystyle \1$', 
+            inputText)
+
+        # Removing multiples of \n
+        inputText = re.sub(r'\n+', r'\n', inputText)
 
         # Tabs
         for i in range(1, 6):
@@ -82,10 +100,6 @@ class Application(tk.Frame):
 
             inputText = re.sub(rf"^{OldFormat}",
                                rf"{NewFormat}", inputText, flags=re.MULTILINE)
-
-        inputText = re.sub(
-            r'<math(?:(?:>| display="inline">))\s*(.*?)(?:\\ |)*?\s*<\/math>', r'$\1$', inputText)
-        inputText = re.sub(r'\n+', r'\n', inputText)
 
         # Categories
         inputText = re.sub(r'\[\[Kategorie:(.*?)\]\]', r'#\1', inputText)
@@ -116,7 +130,7 @@ class Application(tk.Frame):
 
         # References
         inputText = re.sub(
-            r'<ref>|<ref (?:name|group)=".*?">(?:.|\n)*?(?:<\/ref>)', r'', inputText)
+            r'<ref(?: (?:name|group)=".*?")?>(?:.|\n)*?(?:<\/ref>)', r'', inputText)
 
         # Nowiki
         inputText = re.sub(r"<nowiki>(.*?)<\/nowiki>", r"`\1`", inputText)
@@ -154,7 +168,6 @@ class Application(tk.Frame):
         inputText = re.sub(r'\n# ', r'\n 1. ', inputText)
         inputText = re.sub(r'{{enS}}', r'engl.', inputText)
         inputText = re.sub(r'(\\sgn)', r'\\operatorname{sgn}', inputText)
-
 
         # Headings
         for i in range(1, 6):
