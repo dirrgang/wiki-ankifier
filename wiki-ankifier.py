@@ -73,11 +73,11 @@ class Application(tk.Frame):
 
         # MathJax
         inputText = re.sub(
-            r'^:+\s*?<math display="inline">\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(.*?)',
+            r'^:+\s*?<math display="inline">\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(,|\.)?',
             r'$$\\textstyle \1\2$$', inputText,
             flags=re.MULTILINE)
         inputText = re.sub(
-            r'^:+\s*?<math>\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(.*?)',
+            r'^:+\s*?<math>\s*?((?:.|\n)*?)(?:\\ |)*?\s*?<\/math>(,|\.)?',
             r'$$\1\2$$', inputText,
             flags=re.MULTILINE)
 
