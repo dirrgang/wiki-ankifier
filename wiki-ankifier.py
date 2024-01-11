@@ -52,7 +52,13 @@ class Application(tk.Frame):
         self.output(result)
 
     def obsidianfy_and_output(self) -> None:
-        result = self.obsidianfy(pyperclip.paste())
+        raw_input = pyperclip.paste()
+
+        # Format raw_input
+        raw_input = raw_input.replace('\r\n', '\n')
+
+        result = self.obsidianfy(raw_input)
+
         self.output(result)
 
     def ankify(self, inputText: str) -> str:
@@ -124,8 +130,8 @@ class Application(tk.Frame):
         # Converts numbered lists to Markdown format
         inputText = re.sub(r"^#(.*)", r"1. \1", inputText, flags=re.MULTILINE)
 
-        # Converts links to Markdown format
-        inputText = re.sub(r"\[\[(.*?)\|(.*?)\]\]", r"[\2](\1)", inputText)
+        # Remove :w from links
+        inputText = re.sub(r"\[\[w\:", r"[[", inputText)
 
         # Converts headings to Markdown format
         inputText = self.headings(inputText)
